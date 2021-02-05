@@ -42,7 +42,7 @@ def createRepo():
 # Creates folder on PC in specified location
 def createFolder():
     try:
-        os.makedirs(path + "\\"+str(sys.argv[1]), 0o777)
+        os.makedirs(path + str(sys.argv[1]), 0o777)
     except Exception as e:
         print("ERROR IN CREATING FOLDER")
         print(e)
@@ -52,24 +52,36 @@ def createFolder():
 
 # Initialises the folder & pushes it up to GitHub
 def initFolder():
-    command_to_execute = 'cd ' + str(path) + '\\' + str(sys.argv[1]) + ' && echo # '+ str(sys.argv[1]) + ' >> README.md' + ' && git init && git remote add origin https://github.com/' + g.get_user().login + '/' + str(sys.argv[1]) + ' && git add * && git commit -m "Initial commit" && git push -u origin master'
+    folder_path = str(path) + str(sys.argv[1])
+    command_to_execute = 'cd ' + folder_path
+    command_to_execute = command_to_execute + ' && echo "# '+ str(sys.argv[1]) + '" >> README.md'
+    command_to_execute = command_to_execute + ' && git init'
+    command_to_execute = command_to_execute + ' && git add README.md'
+    command_to_execute = command_to_execute + ' && git commit -m "first commit"'
+    command_to_execute = command_to_execute + ' && git branch -M main'
+    command_to_execute = command_to_execute + ' && git remote add origin https://github.com/' + g.get_user().login + '/' + str(sys.argv[1])
+    command_to_execute = command_to_execute + ' && git push -u origin main'
+    
     os.system(command_to_execute)
     print(str(sys.argv[1]) + ' folder initialised')
     os.system('code ' + str(path) + '\\' + str(sys.argv[1]))   
 
-
-if __name__ == "__main__":
-    canCreate()
-    #deletion()
-
-'''
 # Deletes repo in GitHub - Access Token needs to allow deletion
 def deletion():
+    print('\nDELETING REPO\n')
+    githubDeleteToken = os.getenv("GITHUB_DELETE_TOKEN")
+    gd = Github(githubDeleteToken)
     try:
-        g.get_user().get_repo(str(sys.argv[1])).delete()
+        gd.get_user().get_repo(str(sys.argv[1])).delete()
     except Exception as e:
         print("ERROR IN DELETING REPO: ")
         print(e)
     else:
         print("REPO DELETED")
-'''
+
+if __name__ == "__main__":
+    canCreate()
+    #deletion()
+
+
+
